@@ -1,0 +1,101 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+      <h2 class="text-dark fw-bold mb-0">
+        <i class="bi bi-shop text-primary me-2"></i> Gestión de Tiendas
+      </h2>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <button class="btn btn-primary shadow-sm" (click)="newTienda()">
+        <i class="bi bi-plus-circle me-1"></i> Nueva Tienda
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+
+        <app-custom-table 
+          [headers]="tableHeaders"
+          [data]="listTienda"
+          (onView)="viewTienda($event)"
+          (onEdit)="editTienda($event)"
+          (onDelete)="deleteTienda($event)"
+          rowTitle="Haga doble clic para ver los artículos de la tienda"
+          (onRowDoubleClick)="goToInventory($event)">
+        </app-custom-table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalTienda" tabindex="-1" aria-labelledby="modalTiendaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          {{ 
+            isViewMode 
+            ? 'Detalles de la Tienda' 
+            : (
+                tienda.id === 0 
+                ? 'Nueva Tienda' 
+                : 'Editar Tienda'
+              ) 
+          }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #tiendaForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre de la Sucursal</label>
+            <input type="text"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="sucursal"
+              [(ngModel)]="tienda.sucursal" 
+              required 
+              placeholder="Ej. Sucursal Norte"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Dirección</label>
+            <textarea 
+              class="form-control"
+              [disabled]="isViewMode"
+              name="direccion" 
+              [(ngModel)]="tienda.direccion" 
+              required 
+              placeholder="Calle, Número, Colonia"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" *ngIf="!isViewMode">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn"
+          [ngClass]="tienda.id === 0 ? 'btn-primary' : 'btn-warning'" 
+          [disabled]="!tiendaForm.valid" 
+          (click)="saveTienda()" 
+          data-bs-dismiss="modal">
+          Guardar Tienda
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-modal-confirm 
+  modalId="modalEliminar"
+  title="¿Eliminar Tienda?"
+  titleIcon="bi bi-exclamation-triangle-fill"
+  message="Estás a punto de eliminar la tienda:"
+  [itemText]="tienda.sucursal"
+  warningMessage="Esta acción no se puede deshacer."
+  confirmButtonText="Sí, Eliminar"
+  confirmButtonColor="btn-danger"
+  cancelButtonText="Cancelar"
+  (onConfirm)="delete()"
+>
+</app-modal-confirm>

@@ -1,0 +1,35 @@
+<div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header {{ titleBgColor }} {{ titleColor }}">
+        <h5 class="modal-title">
+          <i *ngIf="showTitleIcon" class="{{ titleIcon }}"></i>
+          {{ title }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <p class="mb-1 text-muted">{{ message }}</p>
+        <h4 class="fw-bold text-dark">{{ itemText }}</h4>
+        <p class="small text-danger mt-3" *ngIf="warningMessage">
+          <i class="bi bi-info-circle me-1"></i> {{ warningMessage }}
+        </p>
+      </div>
+      <div class="modal-footer bg-light justify-content-center">
+        <button type="button" 
+          class="btn btn-secondary px-4"
+          *ngIf="cancelButtonText" 
+          data-bs-dismiss="modal">
+            {{ cancelButtonText }}
+          </button>
+        <button type="button" 
+          class="btn btn-danger px-4"
+          *ngIf="showConfirmButton"  
+          (click)="onConfirm.emit()" 
+          data-bs-dismiss="modal">
+          {{ confirmButtonText }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

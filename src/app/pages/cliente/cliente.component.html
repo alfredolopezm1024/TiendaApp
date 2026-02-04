@@ -1,0 +1,129 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+      <h2 class="text-dark fw-bold mb-0">
+        <i class="bi bi-person-lines-fill text-primary me-2"></i> Gestión de Clientes
+      </h2>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <button class="btn  btn-primary shadow-sm" (click)="newCliente()">
+        <i class="bi bi-plus-circle me-1"></i> Nuevo Cliente
+      </button>
+    </div>
+  </div>  
+  
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+
+        <app-custom-table 
+          [headers]="tableHeaders"
+          [data]="listCliente"
+          (onView)="viewCliente($event)"
+          (onEdit)="editCliente($event)"
+          (onDelete)="deleteCliente($event)">
+        </app-custom-table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalCliente" tabindex="-1" aria-labelledby="modalClienteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          {{ 
+            isViewMode 
+            ? 'Detalles de la Cliente' 
+            : (
+                cliente.id === 0 
+                ? 'Nuevo Cliente' 
+                : 'Editar Cliente'
+              ) 
+          }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #clienteForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="nombre"
+              [(ngModel)]="cliente.nombre" 
+              required 
+              placeholder="Nombre"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">apellidos</label>
+            <input type="text"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="apellidos"
+              [(ngModel)]="cliente.apellidos" 
+              required 
+              placeholder="Apellidos"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Dirección</label>
+            <input type="text"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="direccion"
+              [(ngModel)]="cliente.direccion" 
+              required 
+              placeholder="Dirección"/>
+          </div>
+          <div class="mb-3" >
+            <label class="form-label">Correo</label>
+            <input type="text"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="correo"
+              [(ngModel)]="cliente.correo" 
+              required 
+              [disabled]="isViewMode || cliente.id !== 0"
+              placeholder="Correo"/>
+          </div>
+          <div class="mb-3" *ngIf="isViewMode === false && cliente.id === 0">
+            <label class="form-label">Contraseña</label>
+            <input type="password"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="password"              
+              [(ngModel)]="cliente.password" 
+              required 
+              placeholder="Contraseña"/>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" *ngIf="!isViewMode">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn"
+          [ngClass]="cliente.id === 0 ? 'btn-primary' : 'btn-warning'" 
+          [disabled]="!clienteForm.valid" 
+          (click)="saveCliente()" 
+          data-bs-dismiss="modal">
+          Guardar Cliente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-modal-confirm 
+  modalId="modalEliminar"
+  title="¿Eliminar cliente?"
+  titleIcon="bi bi-exclamation-triangle-fill"
+  message="Estás a punto de eliminar el cliente:"
+  [itemText]="cliente.nombre + ' ' + cliente.apellidos"
+  warningMessage="Esta acción no se puede deshacer."
+  confirmButtonText="Sí, Eliminar"
+  confirmButtonColor="btn-danger"
+  cancelButtonText="Cancelar"
+  (onConfirm)="delete()"
+></app-modal-confirm>

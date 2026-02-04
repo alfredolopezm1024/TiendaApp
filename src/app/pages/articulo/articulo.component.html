@@ -1,0 +1,148 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+      <h2 class="text-dark fw-bold mb-0">
+        <i class="bi bi-shop text-primary me-2"></i> Gestión de Artículos
+      </h2>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <button class="btn btn-primary shadow-sm" (click)="newArticulo()">
+        <i class="bi bi-plus-circle me-1"></i> Nuevo Artículo
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+
+        <app-custom-table 
+          [headers]="tableHeaders"
+          [data]="listArticulo"
+          (onView)="viewArticulo($event)"
+          (onEdit)="editArticulo($event)"
+          (onDelete)="deleteArticulo($event)"
+          (onRowDoubleClick)="goToTiendas($event)"
+          rowTitle="Haga doble clic para ver las tiendas con este artículo">
+        </app-custom-table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalArticulo" tabindex="-1" aria-labelledby="modalArticuloLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          {{ 
+            isViewMode 
+            ? 'Detalles del Artículo' 
+            : (
+                articulo.id === 0 
+                ? 'Nuevo Artículo' 
+                : 'Editar Artícuo'
+              ) 
+          }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #articuloForm="ngForm">
+
+          <div class="mb-3">
+            <label class="form-label">Código</label>
+            <input type="text"
+            class="form-control"
+            [disabled]="isViewMode" 
+            name="Código"
+            [(ngModel)]="articulo.codigo" 
+            required 
+            placeholder="Ej. TN-XX-###"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="Descripción"
+              [(ngModel)]="articulo.descripcion" 
+              required 
+              placeholder="Ej. Laptop"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <input type="number"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="Precio"
+              [(ngModel)]="articulo.precio" 
+              required 
+              placeholder="Ej. $0.00"/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cantidad</label>
+            <input type="number"
+              class="form-control"
+              [disabled]="isViewMode" 
+              name="Cantidad"
+              [(ngModel)]="articulo.stock" 
+              (input)="validateInteger($event)"
+              required 
+              placeholder="Ej. 0"/>
+          </div>
+
+          <div class="mb-3" >
+            <label class="form-label">Imagen del Artículo</label>
+            <input type="file" 
+              *ngIf="!isViewMode"
+              class="form-control" 
+              accept="image/png, image/jpeg, image/jpg"
+              (change)="onFileSelected($event)"
+              [disabled]="isViewMode">
+            <div class="form-text" *ngIf="!isViewMode">Máximo 6MB (Formatos: JPG, PNG).</div>
+            <div class="mt-3 text-center" *ngIf="articulo.imagen">
+              <div class="position-relative d-inline-block">
+                <img [src]="articulo.imagen" 
+                      class="img-thumbnail shadow-sm" 
+                      style="max-height: 200px; width: auto;" 
+                      alt="Vista previa">
+                <button type="button" 
+                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                        (click)="articulo.imagen = ''"
+                        *ngIf="!isViewMode">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" *ngIf="!isViewMode">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn"
+          [ngClass]="articulo.id === 0 ? 'btn-primary' : 'btn-warning'" 
+          [disabled]="!articuloForm.valid" 
+          (click)="saveArticulo()" 
+          data-bs-dismiss="modal">
+          Guardar Tienda
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<app-modal-confirm 
+  modalId="modalEliminar"
+  title="¿Eliminar Artículo?"
+  titleIcon="bi bi-exclamation-triangle-fill"
+  message="Estás a punto de eliminar el artículo:"
+  [itemText]="articulo.codigo + ' ' + articulo.descripcion"
+  warningMessage="Esta acción no se puede deshacer."
+  confirmButtonText="Sí, Eliminar"
+  confirmButtonColor="btn-danger"
+  cancelButtonText="Cancelar"
+  (onConfirm)="delete()"
+>
